@@ -6,13 +6,7 @@
 
 // Variables globales
 volatile uint8_t ledState = 0b00000001; // Démarrer avec D1 active
-
-
-// Attendre 125ms : cela permet de comparer la vitesse d'exécution avec le demi-chenillard qui utilise le timer
-void delai_approx(void) {
-    __delay_ms(125);
-}
-
+volatile uint8_t timerRunning = 1;      // État du Timer2 (1 = en marche, 0 = arrêté)
 
 // Fonction pour configurer Timer2
 void setupTimer2(void) {
@@ -40,11 +34,12 @@ void __interrupt() ISR() {
 
         // Mettre à jour les LEDs
         LATD = ledState & 0x0F; // État des 4 bits bas (D1 à D4)
-        
+        LATB = (ledState >> 4) & 0x0F; // État des 4 bits hauts (D5 à D8) (décalé pour correspondre à LATB)
+
         // Décaler l'état des LEDs
         ledState <<= 1; // Décale à gauche
-        if (ledState == 0b00010000) {
-            ledState = 0b00000001; // Revenir à D1 après D4
+        if (ledState == 0) {
+            ledState = 0b00000001; // Revenir à D1 après D8
         }
     }
 }
@@ -54,38 +49,21 @@ void main(void) {
 
      // Configurer les broches des registres B et D (contrôlant les LEDs) comme sorties
     TRISD = 0x00; 
-    TRISB = 0x00;
+    TRISB = 0x00;            // Configurer RB0 (S2) comme entrée, autres en sortie
     // Configuration du Timer2
     setupTimer2();
-    
+    TRISAbits.TRISA5 = 1; // Le bit 5 du registre A est en entrée
+    ANSELAbits.ANSA5 = 0; // Désactive le mode analogique
+            
      while (1) {
-       /* Code à exécuter dans une boucle infinie */
-        // Allumer LED D8
-        LATB = 0b00001000;
-        
-        // Attendre 125 ms
-        delai_approx();
-        //  Allumer LED D7
-        LATB = 0b00000100;
-        
-         // Attendre 125 ms
-        delai_approx();
-        //  Allumer LED D6
-        LATB = 0b00000010;
-         // Attendre 125 ms
-        delai_approx();
-        // Allumer led D5
-        LATB = 0b00000001;
-        
-        // Attendre 125 ms
-         delai_approx();
-    }
-      
-    
-    /* Commentaire sur l'utilité de l'interruption :
-     * Les LEDs D1 à D4 défilent plus vite que les leds D5 à D8. Le timer et les interruption permettent
-     * de gagner en fiabilité et en précision, et d'atteindre effectivement la demi seconde pour le 
-     * demi chenillard (soit un chenillard d'une seconde). A contrario, le demi chenillard D8-D5 est 
-     * plus lent et son déroulement est moins réactif : plus long qu'une demi seconde 
-     */
+
+         if(PORTAbits.RA5 == 0) {  // Lecture de l'entrée numérique (lorsque le bouton est pressé)
+            if (T2CONbits.TMR2ON == 1) { // Si le timer est lancé
+                T2CONbits.TMR2ON = 0; // Arrête Timer2, le défilement des leds s'arrête.
+
+            } else { // Sinon
+                T2CONbits.TMR2ON = 1; // Relance Timer2, le défilement des leds reprend.
+            }
+         }
+     }
 }
