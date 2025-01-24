@@ -35,7 +35,7 @@ void main(void) {
 
             // Décaler l'état des LEDs
             ledState <<= 1; // Décaler à gauche
-            if (ledState == 0) {
+            if (ledState == 0) { // Si aucune led n'est activée
                 ledState = 0b00000001; // Recommencer à D1 après D8
             }
         }
