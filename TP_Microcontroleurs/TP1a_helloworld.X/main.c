@@ -13,8 +13,8 @@ void main(void) {
     /* Code d'initialisation */
 
      // Configurer les broches des registres B et D (contrôlant les LEDs) comme sorties
-    TRISD = 0x00; 
-    TRISB = 0x00;
+    TRISD &= 0xF0; 
+    TRISB &= 0xF0;
    
     
     while (1) { // Toujours

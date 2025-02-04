@@ -7,12 +7,13 @@
 // Variables globales
 volatile uint8_t ledState = 0b00000001; // Démarrer avec D1 active
 volatile uint8_t timerRunning = 1;      // État du Timer2 (1 = en marche, 0 = arrêté)
+volatile uint8_t clockCnt = 0;
 
 // Fonction pour configurer Timer2
 void setupTimer2(void) {
-    T2CONbits.T2CKPS = 0b11;  // Prescaler = 1:16
-    T2CONbits.T2OUTPS = 0b1111; // Postscaler = 1:16
-    PR2 = 125;                // Période de Timer2 pour 125ms (125ms * 8leds = 1s)
+    T2CONbits.T2CKPS = 0b0;  // Prescaler = 1:1
+    T2CONbits.T2OUTPS = 0b1000; // Postscaler = 1:8
+    PR2 = 249;                // Période de Timer2 pour 1ms
     T2CONbits.TMR2ON = 1;     // Activer Timer2
     
     
@@ -31,16 +32,21 @@ void setupTimer2(void) {
 void __interrupt() ISR() {
     if (PIR1bits.TMR2IF) {  // Vérifie si l'interruption est déclenchée par Timer2
         PIR1bits.TMR2IF = 0; // Efface le flag d'interruption
+        clockCnt ++;
+        
+        if (clockCnt == 125) {
+            // Mettre à jour les LEDs
+            LATD = ledState & 0x0F; // État des 4 bits bas (D1 à D4)
+            LATB = (ledState >> 4) & 0x0F; // État des 4 bits hauts (D5 à D8) (décalé pour correspondre à LATB)
 
-        // Mettre à jour les LEDs
-        LATD = ledState & 0x0F; // État des 4 bits bas (D1 à D4)
-        LATB = (ledState >> 4) & 0x0F; // État des 4 bits hauts (D5 à D8) (décalé pour correspondre à LATB)
-
-        // Décaler l'état des LEDs
-        ledState <<= 1; // Décale à gauche
-        if (ledState == 0) {
-            ledState = 0b00000001; // Revenir à D1 après D8
+            // Décaler l'état des LEDs
+            ledState <<= 1; // Décale à gauche
+            if (ledState == 0) {
+                ledState = 0b00000001; // Revenir à D1 après D8
+            }
+            clockCnt = 0;
         }
+        
     }
 }
 
