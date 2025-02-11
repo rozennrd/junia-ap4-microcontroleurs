@@ -3,9 +3,6 @@
 
 #define _XTAL_FREQ 8000000
 
-volatile uint8_t clockCnt = 0;
-volatile unsigned char ascend = 1;
-
 void UART_Write(char data) {
     while(!TXIF);  // Wait for TXIF (Transmit Interrupt Flag) to be set
     TX1REG = data;  // Load data into TXREG to send
@@ -28,6 +25,8 @@ void __interrupt() UART_ISR() {
         
         PIR1bits.RCIF = 0; // Efface le flag d'interruption
     }
+    
+     unsigned int adc_value = ADC_Read();
 }
 
 char UART_Read(void) {
