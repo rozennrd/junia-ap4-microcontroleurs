@@ -50,10 +50,10 @@ void __interrupt() ISR() {
             set_PWM4_duty_cycle(duty_cycle);
         }
         
-        // setup le pw à partir de clockCnt
+        // Arrivée au bout du cycle (1 seconde)
         
         if (clockCnt == 25) {
-            ascend = !ascend; // On inverse le cycle
+            ascend = !ascend; // On inverse le cycle (si ascendant : devient descendant, sinon : devient ascendant)
             clockCnt = 0; // On remet le count à 0
         }
         

@@ -19,10 +19,11 @@
                    projectFiles="true">
       <itemPath>configbits.h</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>utils.h</itemPath>
-      <itemPath>utils.c</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../TP3a_uart_tx.X</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -147,6 +148,12 @@
         <property key="program-the-device-with-default-config-words" value="false"/>
         <property key="remove-unused-sections" value="true"/>
       </HI-TECH-LINK>
+      <PK5Tool>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
+      </PK5Tool>
+      <Tool>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
+      </Tool>
       <XC8-CO>
         <property key="coverage-enable" value=""/>
         <property key="stack-guidance" value="false"/>

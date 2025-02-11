@@ -19,8 +19,6 @@
                    projectFiles="true">
       <itemPath>configbits.h</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>utils.h</itemPath>
-      <itemPath>utils.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
